@@ -1,20 +1,40 @@
-# Welcome to your Lovable project
+# Web Scrape Unleashed
 
-## Project info
+A powerful web scraping tool that combines React/TypeScript frontend with Python Flask backend for extracting product information from e-commerce websites.
 
-**URL**: https://lovable.dev/projects/c322f460-21f6-4b56-9537-3a4826e0a317
+## Features
 
-## How can I edit this code?
+- Universal scraping support for multiple e-commerce platforms
+- Anti-bot measures and human-like behavior
+- Structured data extraction using OpenAI
+- Clean and modern React UI with real-time progress updates
+- Export to JSON or CSV formats
 
-There are several ways of editing your application.
+## Setup
 
-**Use Lovable**
+### Backend Setup
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c322f460-21f6-4b56-9537-3a4826e0a317) and start prompting.
+1. Create a Python virtual environment:
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+```
 
-Changes made via Lovable will be committed automatically to this repo.
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+python -m playwright install
+```
 
-**Use your preferred IDE**
+3. Create a `.env` file in the project root:
+```bash
+cp .env.example .env
+```
+
+4. Update the `.env` file with your OpenAI API key
+
+### Frontend Setup
 
 If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
@@ -50,24 +70,56 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
+## Environment Variables
 
-This project is built with:
+The following environment variables are required:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `OPENAI_API_KEY`: Your OpenAI API key for data extraction
+- `VITE_BACKEND_URL`: Backend server URL (default: http://localhost:5001)
 
-## How can I deploy this project?
+## Usage
 
-Simply open [Lovable](https://lovable.dev/projects/c322f460-21f6-4b56-9537-3a4826e0a317) and click on Share -> Publish.
+1. Start the backend server:
+```bash
+cd backend
+source venv/bin/activate
+python app.py
+```
 
-## Can I connect a custom domain to my Lovable project?
+2. Start the frontend development server:
+```bash
+npm run dev
+```
 
-Yes, you can!
+3. Open http://localhost:8080 in your browser
+4. Enter a website URL, search term, and select fields to extract
+5. Add your OpenAI API key
+6. Click "Start Scraping"
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Supported Websites
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- eBay (Global)
+- DigiKey
+- Mouser
+- RS Components
+- Radwell
+- Generic e-commerce sites (basic support)
+
+## Technologies Used
+
+- Frontend:
+  - React
+  - TypeScript
+  - Vite
+  - shadcn-ui
+  - Tailwind CSS
+- Backend:
+  - Python
+  - Flask
+  - Playwright
+  - BeautifulSoup4
+  - OpenAI API
+
+## License
+
+MIT
