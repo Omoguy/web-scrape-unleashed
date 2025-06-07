@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,11 +6,11 @@ import { Search, Globe, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { FieldManager } from "@/components/FieldManager";
 import { ResultsTable } from "@/components/ResultsTable";
-import { ApiKeyInput } from "@/components/ApiKeyInput";
+import { ScrapingBeeApiKeyInput } from "@/components/ScrapingBeeApiKeyInput";
 import { SearchConfiguration } from "@/components/SearchConfiguration";
 import { ActionPanel } from "@/components/ActionPanel";
 import { ExportPanel } from "@/components/ExportPanel";
-import { scraperService } from "@/services/scraperService";
+import { scrapingBeeService } from "@/services/scrapingBeeService";
 
 export const ScraperDashboard = () => {
   const [selectedWebsite, setSelectedWebsite] = useState(
@@ -22,6 +23,7 @@ export const ScraperDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState([]);
+  const [apiUsage, setApiUsage] = useState<{ used: number; remaining: number } | null>(null);
   const { toast } = useToast();
 
   const handleStartScraping = async () => {
@@ -29,6 +31,15 @@ export const ScraperDashboard = () => {
       toast({
         title: "Error",
         description: "Please enter a search term",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!apiKey.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your ScrapingBee API key",
         variant: "destructive",
       });
       return;
@@ -50,19 +61,19 @@ export const ScraperDashboard = () => {
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) return prev;
-        return prev + Math.random() * 10;
+        return prev + Math.random() * 15;
       });
-    }, 300);
+    }, 500);
 
     try {
-      console.log("Starting frontend scraping with config:", {
+      console.log("Starting ScrapingBee scraping with config:", {
         website_url: selectedWebsite,
         search_term: searchTerm,
         extract_fields: extractFields,
         max_results: parseInt(maxResults),
       });
 
-      const result = await scraperService.scrapeProducts({
+      const result = await scrapingBeeService.scrapeProducts({
         website_url: selectedWebsite,
         search_term: searchTerm,
         extract_fields: extractFields,
@@ -74,28 +85,31 @@ export const ScraperDashboard = () => {
       setProgress(100);
 
       if (result.success && result.data) {
-        console.log("Scraping successful, received data:", result.data);
+        console.log("ScrapingBee scraping successful:", result.data);
         setResults(result.data);
+        
+        if (result.usage) {
+          setApiUsage(result.usage);
+        }
 
         toast({
           title: "Success!",
-          description: `Scraped ${result.data.length} products`,
+          description: `Scraped ${result.data.length} products using ScrapingBee API`,
         });
       } else {
-        console.error("Scraping failed:", result.error);
+        console.error("ScrapingBee scraping failed:", result.error);
         toast({
-          title: "Error",
+          title: "Scraping Failed",
           description: result.error || "Failed to scrape products",
           variant: "destructive",
         });
       }
     } catch (error) {
       clearInterval(progressInterval);
-      console.error("Scraping error:", error);
+      console.error("ScrapingBee error:", error);
       toast({
         title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to scrape products",
+        description: error instanceof Error ? error.message : "Scraping failed",
         variant: "destructive",
       });
     } finally {
@@ -152,16 +166,23 @@ export const ScraperDashboard = () => {
             <Search className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Universal E-commerce Scraper
+            Dynamic Pricing Engine
           </h1>
         </div>
         <p className="text-lg text-gray-600 mb-2">
-          Search any product on any website and extract custom information
+          Production-ready competitor price monitoring powered by ScrapingBee
         </p>
-        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-          <Globe className="w-4 h-4 mr-1" />
-          Live Scraping Mode
-        </Badge>
+        <div className="flex items-center justify-center gap-2">
+          <Badge variant="secondary" className="bg-green-100 text-green-700">
+            <Globe className="w-4 h-4 mr-1" />
+            ScrapingBee API
+          </Badge>
+          {apiUsage && (
+            <Badge variant="outline" className="text-blue-700">
+              Credits: {apiUsage.remaining} remaining
+            </Badge>
+          )}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -175,11 +196,9 @@ export const ScraperDashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-700">
-                  📝 <strong>Live Mode:</strong> Using Python backend for real
-                  web scraping. Make sure to provide a valid OpenAI API key for
-                  advanced data extraction.
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-700">
+                  🚀 <strong>Production Ready:</strong> Using ScrapingBee API for reliable, scalable web scraping with JavaScript rendering, IP rotation, and CAPTCHA solving.
                 </p>
               </div>
 
@@ -202,6 +221,18 @@ export const ScraperDashboard = () => {
 
         {/* Action Panel */}
         <div className="space-y-6">
+          <Card className="border-0 shadow-lg bg-white/70 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-lg">API Configuration</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ScrapingBeeApiKeyInput
+                apiKey={apiKey}
+                onApiKeyChange={setApiKey}
+              />
+            </CardContent>
+          </Card>
+
           <ActionPanel
             isLoading={isLoading}
             progress={progress}
